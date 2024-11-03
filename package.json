@@ -27,7 +27,7 @@
 		"check": "npx npm-check-updates  --interactive --format group"
 	},
 	"dependencies": {
-		"@ai-sdk/anthropic": "^0.0.53",
+		"@ai-sdk/anthropic": "^0.0.54",
 		"ai": "^3.4.31",
 		"vscode-languageserver": "^9.0.1",
 		"vscode-languageserver-textdocument": "^1.0.12"
