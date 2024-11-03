@@ -3,10 +3,10 @@ const TEMPERATURE_INSTRUCTION = "// temperature:";
 const PROMPT_INSTRUCTION = "// prompt:";
 
 interface EmbeddedInstructions {
-	model: string | null;
-	temperature: number | null;
-	prompt: string | null;
-	context: string;
+  model: string | null;
+  temperature: number | null;
+  prompt: string | null;
+  context: string;
 }
 
 /**
@@ -32,30 +32,30 @@ interface EmbeddedInstructions {
  * console.log(result.context); // 'Some context here\nMore context'
  */
 export function parseContext(input: string): EmbeddedInstructions {
-	let model: string | null = null;
-	let temperature: number | null = null;
-	let prompt: string | null = null;
-	const context: string[] = [];
+  let model: string | null = null;
+  let temperature: number | null = null;
+  let prompt: string | null = null;
+  const context: string[] = [];
 
-	const lines = input.split("\n");
-	for (const line of lines) {
-		if (line.startsWith(MODEL_INSTRUCTION)) {
-			model = line.replace(MODEL_INSTRUCTION, "").trim();
-		} else if (line.startsWith(TEMPERATURE_INSTRUCTION)) {
-			temperature =
-				Number.parseFloat(line.replace(TEMPERATURE_INSTRUCTION, "").trim()) ||
-				null;
-		} else if (line.startsWith(PROMPT_INSTRUCTION)) {
-			prompt = line.replace(PROMPT_INSTRUCTION, "").trim();
-		} else {
-			context.push(line.trim());
-		}
-	}
+  const lines = input.split("\n");
+  for (const line of lines) {
+    if (line.startsWith(MODEL_INSTRUCTION)) {
+      model = line.replace(MODEL_INSTRUCTION, "").trim();
+    } else if (line.startsWith(TEMPERATURE_INSTRUCTION)) {
+      temperature =
+        Number.parseFloat(line.replace(TEMPERATURE_INSTRUCTION, "").trim()) ||
+        null;
+    } else if (line.startsWith(PROMPT_INSTRUCTION)) {
+      prompt = line.replace(PROMPT_INSTRUCTION, "").trim();
+    } else {
+      context.push(line.trim());
+    }
+  }
 
-	return {
-		model,
-		temperature,
-		prompt,
-		context: context.join("\n"),
-	};
+  return {
+    model,
+    temperature,
+    prompt,
+    context: context.join("\n"),
+  };
 }

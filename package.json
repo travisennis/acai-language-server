@@ -1,41 +1,41 @@
 {
-	"name": "@travisennis/acai-language-server",
-	"version": "1.0.0",
-	"description": "A language server that adds the ability to instruct an LLM.",
-	"type": "module",
-	"exports": {
-		"types": "./dist/index.d.ts",
-		"default": "./dist/index.js"
-	},
-	"keywords": ["cli", "ai", "llm"],
-	"author": "Travis Ennis",
-	"license": "MIT",
-	"scripts": {
-		"build": "npm run compile",
-		"clean": "rm -rf ./dist/",
-		"compile": "rm -rf ./dist && tsc && cp -r ./dist/source/. ./dist && rm -rf ./dist/source",
-		"lint": "biome lint",
-		"lint:fix": "biome lint --unsafe --write",
-		"lint:staged": "biome lint --error-on-warnings --no-errors-on-unmatched --staged",
-		"prepare": "npm run compile",
-		"test": "node --import tsx --test test/**/*.test.ts",
-		"pretest": "npm run compile",
-		"format": "biome format --write",
-		"dev": "tsx ./source/index.ts",
-		"oxlint": "npx oxlint@latest --ignore-path .gitignore --deny correctness --deny suspicous --deny pedantic --deny style --node-plugin",
-		"knip": "npx knip",
-		"check": "npx npm-check-updates  --interactive --format group"
-	},
-	"dependencies": {
-		"@ai-sdk/anthropic": "^0.0.54",
-		"ai": "^3.4.31",
-		"vscode-languageserver": "^9.0.1",
-		"vscode-languageserver-textdocument": "^1.0.12"
-	},
-	"devDependencies": {
-		"@biomejs/biome": "1.9.4",
-		"@types/node": "^22.8.6",
-		"tsx": "^4.19.2",
-		"typescript": "^5.7.0-beta"
-	}
+  "name": "@travisennis/acai-language-server",
+  "version": "1.0.0",
+  "description": "A language server that adds the ability to instruct an LLM.",
+  "type": "module",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "default": "./dist/index.js"
+  },
+  "keywords": ["cli", "ai", "llm"],
+  "author": "Travis Ennis",
+  "license": "MIT",
+  "scripts": {
+    "build": "npm run compile",
+    "clean": "rm -rf ./dist/",
+    "compile": "rm -rf ./dist && tsc && cp -r ./dist/source/. ./dist && rm -rf ./dist/source",
+    "lint": "biome lint",
+    "lint:fix": "biome lint --unsafe --write",
+    "lint:staged": "biome lint --error-on-warnings --no-errors-on-unmatched --staged",
+    "prepare": "npm run compile",
+    "test": "node --import tsx --test test/**/*.test.ts",
+    "pretest": "npm run compile",
+    "format": "biome format --write",
+    "dev": "tsx ./source/index.ts",
+    "oxlint": "npx oxlint@latest --ignore-path .gitignore --deny correctness --deny suspicous --deny pedantic --deny style --node-plugin",
+    "knip": "npx knip",
+    "check": "npx npm-check-updates  --interactive --format group"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^0.0.54",
+    "ai": "^3.4.31",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.12"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@types/node": "^22.8.6",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.0-beta"
+  }
 }
