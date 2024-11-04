@@ -1,6 +1,7 @@
 const MODEL_INSTRUCTION = "// model:";
 const TEMPERATURE_INSTRUCTION = "// temperature:";
 const PROMPT_INSTRUCTION = "// prompt:";
+const SHORT_PROMPT_INSTRUCTION = "//%";
 
 interface EmbeddedInstructions {
   model: string | null;
@@ -47,6 +48,8 @@ export function parseContext(input: string): EmbeddedInstructions {
         null;
     } else if (line.startsWith(PROMPT_INSTRUCTION)) {
       prompt = line.replace(PROMPT_INSTRUCTION, "").trim();
+    } else if (line.startsWith(SHORT_PROMPT_INSTRUCTION)) {
+      prompt = line.replace(SHORT_PROMPT_INSTRUCTION, "").trim();
     } else {
       context.push(line.trim());
     }
