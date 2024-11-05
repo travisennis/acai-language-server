@@ -1,6 +1,6 @@
 {
   "name": "@travisennis/acai-language-server",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A language server that adds the ability to instruct an LLM.",
   "type": "module",
   "exports": {
