@@ -27,14 +27,14 @@
     "check": "npx npm-check-updates  --interactive --format group"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^0.0.54",
-    "ai": "^3.4.31",
+    "@ai-sdk/anthropic": "^0.0.56",
+    "ai": "^3.4.33",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.12"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@types/node": "^22.8.6",
+    "@types/node": "^22.9.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.0-beta"
   }
