@@ -88,20 +88,27 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
 
       const context = parseContext(documentText);
 
+      const userPrompt = `
+\`\`\`
+${context.context}
+\`\`\`
+
+${context.prompt}
+    `.trim();
+
       try {
         const { text } = await generateText({
           model: anthropic(context.model ?? "claude-3-5-sonnet-20241022"),
           system:
             "You are a highly skilled coding assistant and senior software engineer. Your task is to provide concise, accurate, and efficient solutions to the user's coding requests. Please respond with only the revised code. If your response is a new addition to the code, then return your additions along with the original code. Ensure your answer is in plain text without any Markdown formatting. Focus on best practices, code optimization, and maintainability in your solutions.",
           temperature: context.temperature ?? 0.3,
-          prompt: `
-\`\`\`
-${context.context}
-\`\`\`
-
-${context.prompt}
-    `.trim(),
+          prompt: userPrompt,
         });
+
+        log.write("User:");
+        log.write(userPrompt);
+        log.write("Assistant:");
+        log.write(text);
 
         params.edit = {
           changes: {
