@@ -2,21 +2,21 @@ import {
   type CodeAction,
   CodeActionKind,
   type CodeActionParams,
-  createConnection,
   type Diagnostic,
   // DiagnosticSeverity,
   type InitializeParams,
   type InitializeResult,
   ProposedFeatures,
-  TextDocuments,
   TextDocumentSyncKind,
+  TextDocuments,
   TextEdit,
+  createConnection,
 } from "vscode-languageserver/node.js";
 
 import { type Range, TextDocument } from "vscode-languageserver-textdocument";
 
-import { generateText } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
+import { generateText } from "ai";
 
 import { parseContext } from "./embeddingInstructions.ts";
 import log from "./log.ts";
