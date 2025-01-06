@@ -31,13 +31,13 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.0.6",
-    "ai": "^4.0.22",
+    "ai": "^4.0.26",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.12"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.10.5",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }
