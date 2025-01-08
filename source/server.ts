@@ -15,11 +15,19 @@ import {
 
 import { type Range, TextDocument } from "vscode-languageserver-textdocument";
 
-import { anthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
 
+import path from "node:path";
 import { parseContext } from "./embeddingInstructions.ts";
 import log from "./log.ts";
+
+import envPaths from "@travisennis/stdlib/env";
+import {
+  languageModel,
+  type ModelName,
+  wrapLanguageModel,
+} from "@travisennis/acai-core";
+import { auditMessage } from "@travisennis/acai-core/middleware";
 
 export function createTextDocuments() {
   // Create a text document manager
@@ -79,6 +87,9 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
 
   connection.onCodeActionResolve(async (params) => {
     if (params.data?.documentUri && params.data?.range) {
+      const stateDir = envPaths("acai").state;
+      const MESSAGES_FILE_PATH = path.join(stateDir, "messages.jsonl");
+
       const textDocument = documents.get(params.data.documentUri);
       if (!textDocument) return params;
 
@@ -87,6 +98,11 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
       const documentText = textDocument.getText(range);
 
       const context = parseContext(documentText);
+
+      const langModel = wrapLanguageModel(
+        languageModel((context.model ?? "anthropic:sonnet") as ModelName),
+        auditMessage({ path: MESSAGES_FILE_PATH }),
+      );
 
       const userPrompt = `
 \`\`\`
@@ -98,17 +114,12 @@ ${context.prompt}
 
       try {
         const { text } = await generateText({
-          model: anthropic(context.model ?? "claude-3-5-sonnet-20241022"),
+          model: langModel,
           system:
             "You are a highly skilled coding assistant and senior software engineer. Your task is to provide concise, accurate, and efficient solutions to the user's coding requests. Please respond with only the revised code. If your response is a new addition to the code, then return your additions along with the original code. Only return the code. Ensure your answer is in plain text without any Markdown formatting. Focus on best practices, code optimization, and maintainability in your solutions.",
           temperature: context.temperature ?? 0.3,
           prompt: userPrompt,
         });
-
-        log.write("User:");
-        log.write(userPrompt);
-        log.write("Assistant:");
-        log.write(text);
 
         params.edit = {
           changes: {
