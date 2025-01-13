@@ -40,18 +40,19 @@ export function parseContext(input: string): EmbeddedInstructions {
 
   const lines = input.split("\n");
   for (const line of lines) {
-    if (line.startsWith(MODEL_INSTRUCTION)) {
-      model = line.replace(MODEL_INSTRUCTION, "").trim();
-    } else if (line.startsWith(TEMPERATURE_INSTRUCTION)) {
+    const tl = line.trim();
+    if (tl.startsWith(MODEL_INSTRUCTION)) {
+      model = tl.replace(MODEL_INSTRUCTION, "").trim();
+    } else if (tl.startsWith(TEMPERATURE_INSTRUCTION)) {
       temperature =
-        Number.parseFloat(line.replace(TEMPERATURE_INSTRUCTION, "").trim()) ||
+        Number.parseFloat(tl.replace(TEMPERATURE_INSTRUCTION, "").trim()) ||
         null;
-    } else if (line.startsWith(PROMPT_INSTRUCTION)) {
-      prompt = line.replace(PROMPT_INSTRUCTION, "").trim();
-    } else if (line.startsWith(SHORT_PROMPT_INSTRUCTION)) {
-      prompt = line.replace(SHORT_PROMPT_INSTRUCTION, "").trim();
+    } else if (tl.startsWith(PROMPT_INSTRUCTION)) {
+      prompt = tl.replace(PROMPT_INSTRUCTION, "").trim();
+    } else if (tl.startsWith(SHORT_PROMPT_INSTRUCTION)) {
+      prompt = tl.replace(SHORT_PROMPT_INSTRUCTION, "").trim();
     } else {
-      context.push(line.trim());
+      context.push(line);
     }
   }
 

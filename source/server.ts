@@ -97,7 +97,11 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
       const range = params.data.range as Range;
       const documentText = textDocument.getText(range);
 
+      log.write(documentText);
+
       const context = parseContext(documentText);
+
+      log.write(context);
 
       const langModel = wrapLanguageModel(
         languageModel((context.model ?? "anthropic:sonnet") as ModelName),
@@ -109,7 +113,7 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
 ${context.context}
 \`\`\`
 
-${context.prompt}
+${context.prompt ?? ""}
     `.trim();
 
       try {
