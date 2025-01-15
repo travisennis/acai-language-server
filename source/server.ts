@@ -120,14 +120,16 @@ ${context.prompt ?? ""}
         const { text } = await generateText({
           model: langModel,
           system:
-            "You are a highly skilled coding assistant and senior software engineer. Your task is to provide concise, accurate, and efficient solutions to the user's coding requests. Please respond with only the revised code. If your response is a new addition to the code, then return your additions along with the original code. Only return the code. Ensure your answer is in plain text without any Markdown formatting. Focus on best practices, code optimization, and maintainability in your solutions.",
+            "You are a highly skilled coding assistant and senior software engineer. Your task is to provide concise, accurate, and efficient solutions to the user's coding requests. Focus on best practices, code optimization, and maintainability in your solutions. Please respond with only the revised code. If your response is a new addition to the code, then return your additions along with the original code. Only return the code. Do not wrap the code in Markdown code blocks. Ensure your answer is in plain text without any Markdown formatting. ",
           temperature: context.temperature ?? 0.3,
           prompt: userPrompt,
         });
 
         params.edit = {
           changes: {
-            [params.data.documentUri]: [TextEdit.replace(range, text)],
+            [params.data.documentUri]: [
+              TextEdit.replace(range, extractCode(text)),
+            ],
           },
         };
       } catch (error) {
@@ -181,3 +183,14 @@ ${context.prompt ?? ""}
 
   return connection;
 }
+
+const MD_CODE_BLOCK = /```(?:[\w-]+)?\n(.*?)```/s;
+
+export const extractCode = (text: string): string => {
+  const pattern = MD_CODE_BLOCK;
+  const match = text.match(pattern);
+  if (match) {
+    return match[1].trim();
+  }
+  return text;
+};
