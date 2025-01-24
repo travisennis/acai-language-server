@@ -1,7 +1,10 @@
 import {
+  type CancellationToken,
   type CodeAction,
   CodeActionKind,
   type CodeActionParams,
+  type CompletionItem,
+  type CompletionParams,
   type Diagnostic,
   // DiagnosticSeverity,
   type InitializeParams,
@@ -10,6 +13,7 @@ import {
   TextDocumentSyncKind,
   TextDocuments,
   TextEdit,
+  type WorkDoneProgressReporter,
   createConnection,
 } from "vscode-languageserver/node.js";
 
@@ -21,13 +25,13 @@ import path from "node:path";
 import { parseContext } from "./embeddingInstructions.ts";
 import log from "./log.ts";
 
-import envPaths from "@travisennis/stdlib/env";
 import {
-  languageModel,
   type ModelName,
+  languageModel,
   wrapLanguageModel,
 } from "@travisennis/acai-core";
 import { auditMessage } from "@travisennis/acai-core/middleware";
+import envPaths from "@travisennis/stdlib/env";
 
 export function createTextDocuments() {
   // Create a text document manager
@@ -49,6 +53,7 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
     const result: InitializeResult = {
       capabilities: {
         textDocumentSync: TextDocumentSyncKind.Incremental,
+        completionProvider: { resolveProvider: true },
         // Enable code actions
         codeActionProvider: {
           codeActionKinds: [CodeActionKind.QuickFix],
@@ -58,6 +63,122 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
     };
     return result;
   });
+
+  connection.onCompletion(
+    async (
+      params: CompletionParams,
+      _token: CancellationToken,
+      workDoneProgress: WorkDoneProgressReporter,
+    ): Promise<CompletionItem[]> => {
+      const document = documents.get(params.textDocument.uri);
+      if (!document) return [];
+
+      const position = params.position;
+      const text = document.getText();
+
+      // Get the current line up to the cursor position
+      const lines = text.split("\n");
+      const currentLine = lines[position.line];
+      const linePrefix = currentLine.slice(0, position.character);
+
+      // Get some context before the cursor (previous few lines)
+      const contextLines = lines.slice(
+        Math.max(0, position.line - 5),
+        position.line,
+      );
+      const context = [...contextLines, linePrefix].join("\n");
+
+      try {
+        workDoneProgress.begin("Generating completions...");
+
+        const stateDir = envPaths("acai").state;
+        const MESSAGES_FILE_PATH = path.join(
+          stateDir,
+          "completion-messages.jsonl",
+        );
+
+        const langModel = wrapLanguageModel(
+          languageModel("anthropic:haiku"),
+          auditMessage({ path: MESSAGES_FILE_PATH }),
+        );
+
+        const { text: completionText } = await generateText({
+          model: langModel,
+          system:
+            'You are a code completion assistant. Based on the code context provided, suggest relevant code completions. Return a JSON array of completion items, where each item has "label" (what shows in the completion list) and "detail" (full completion text). Keep suggestions concise and relevant.',
+          temperature: 0.3,
+          prompt: `Given this code context, provide relevant code completions:\n\n${context}`,
+        });
+
+        let completions: Array<{ label: string; detail: string }> = [];
+        try {
+          completions = JSON.parse(extractCode(completionText));
+        } catch (e) {
+          log.write(
+            `Failed to parse completion response: ${(e as Error).message}`,
+          );
+          return [];
+        }
+
+        return completions.map((item, index) => ({
+          label: item.label,
+          kind: 15, // Snippet
+          detail: item.detail,
+          sortText: String(index).padStart(5, "0"),
+          insertText: item.detail,
+          data: {
+            // Store data for resolve
+            uri: params.textDocument.uri,
+            detail: item.detail,
+          },
+        }));
+      } catch (error) {
+        log.write(`Error generating completions: ${(error as Error).message}`);
+        return [];
+      } finally {
+        workDoneProgress.done();
+      }
+    },
+  );
+
+  connection.onCompletionResolve(
+    async (item: CompletionItem): Promise<CompletionItem> => {
+      // If we already have detailed information, return as is
+      if (item.documentation) return item;
+
+      try {
+        if (item.data?.uri && item.data?.detail) {
+          const stateDir = envPaths("acai").state;
+          const MESSAGES_FILE_PATH = path.join(
+            stateDir,
+            "completion-messages.jsonl",
+          );
+
+          const langModel = wrapLanguageModel(
+            languageModel("anthropic:haiku"),
+            auditMessage({ path: MESSAGES_FILE_PATH }),
+          );
+
+          const { text: documentation } = await generateText({
+            model: langModel,
+            system:
+              "You are a code documentation assistant. Provide a brief, clear explanation of the code completion suggestion.",
+            temperature: 0.3,
+            prompt: `Explain this code completion suggestion briefly:\n\n${item.data.detail}`,
+          });
+
+          item.documentation = {
+            kind: "markdown",
+            value: documentation.trim(),
+          };
+        }
+      } catch (error) {
+        log.write(`Error resolving completion: ${(error as Error).message}`);
+      }
+
+      return item;
+    },
+  );
 
   // Register code action handler
   connection.onCodeAction((params: CodeActionParams): CodeAction[] => {
@@ -88,7 +209,10 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
   connection.onCodeActionResolve(async (params) => {
     if (params.data?.documentUri && params.data?.range) {
       const stateDir = envPaths("acai").state;
-      const MESSAGES_FILE_PATH = path.join(stateDir, "messages.jsonl");
+      const MESSAGES_FILE_PATH = path.join(
+        stateDir,
+        "completion-messages.jsonl",
+      );
 
       const textDocument = documents.get(params.data.documentUri);
       if (!textDocument) return params;
