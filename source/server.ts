@@ -53,7 +53,7 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
     const result: InitializeResult = {
       capabilities: {
         textDocumentSync: TextDocumentSyncKind.Incremental,
-        completionProvider: { resolveProvider: true },
+        // completionProvider: { resolveProvider: true },
         // Enable code actions
         codeActionProvider: {
           codeActionKinds: [CodeActionKind.QuickFix],
@@ -126,12 +126,36 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
           let insertText = item.detail;
 
           // If we're in the middle of typing a function declaration
-          if (alreadyTyped.includes('function')) {
+          if (alreadyTyped.includes("function")) {
             // Don't include the function declaration part if it's already typed
-            const functionMatch = alreadyTyped.match(/function\s+([\w$]*)/)?.[0];
-            if (functionMatch && insertText.startsWith('function')) {
-              // Remove the function declaration part and any leading whitespace
-              insertText = insertText.slice(functionMatch.length).trimLeft();
+            const functionMatch =
+              alreadyTyped.match(/function\s+([\w$]*)/)?.[0];
+            if (functionMatch && insertText.startsWith("function")) {
+              // Remove the function declaration part but preserve the space
+              insertText = ` ${insertText.slice(functionMatch.length).trimStart()}`;
+
+              // If this is a TypeScript file (based on URI), add type annotations
+              const fileUri = params.textDocument.uri;
+              if (fileUri.endsWith(".ts")) {
+                // Convert the completion to TypeScript format if it's not already
+                if (
+                  !(insertText.includes("<T>") || insertText.includes(": "))
+                ) {
+                  // Extract the parameter list
+                  const paramMatch = insertText.match(/\((.*?)\)/);
+                  if (paramMatch) {
+                    const params = paramMatch[1]
+                      .split(",")
+                      .map((p) => p.trim());
+                    // Add TypeScript generic and type annotations
+                    const tsParams = params.map((p) => `${p}: T[]`).join(", ");
+                    insertText = insertText.replace(
+                      /\((.*?)\)/,
+                      `<T>(${tsParams})`,
+                    );
+                  }
+                }
+              }
             }
           } else if (insertText.startsWith(alreadyTyped)) {
             // For other cases, if the completion starts with what's typed, remove that part
