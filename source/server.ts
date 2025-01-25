@@ -120,18 +120,37 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
           return [];
         }
 
-        return completions.map((item, index) => ({
-          label: item.label,
-          kind: 15, // Snippet
-          detail: item.detail,
-          sortText: String(index).padStart(5, "0"),
-          insertText: item.detail,
-          data: {
-            // Store data for resolve
-            uri: params.textDocument.uri,
+        return completions.map((item, index) => {
+          // Get what's already typed, trimming whitespace
+          const alreadyTyped = linePrefix.trimEnd();
+          let insertText = item.detail;
+
+          // If we're in the middle of typing a function declaration
+          if (alreadyTyped.includes('function')) {
+            // Don't include the function declaration part if it's already typed
+            const functionMatch = alreadyTyped.match(/function\s+([\w$]*)/)?.[0];
+            if (functionMatch && insertText.startsWith('function')) {
+              // Remove the function declaration part and any leading whitespace
+              insertText = insertText.slice(functionMatch.length).trimLeft();
+            }
+          } else if (insertText.startsWith(alreadyTyped)) {
+            // For other cases, if the completion starts with what's typed, remove that part
+            insertText = insertText.slice(alreadyTyped.length);
+          }
+
+          return {
+            label: item.label,
+            kind: 15, // Snippet
             detail: item.detail,
-          },
-        }));
+            sortText: String(index).padStart(5, "0"),
+            insertText: insertText,
+            data: {
+              // Store data for resolve
+              uri: params.textDocument.uri,
+              detail: item.detail,
+            },
+          };
+        });
       } catch (error) {
         log.write(`Error generating completions: ${(error as Error).message}`);
         return [];
