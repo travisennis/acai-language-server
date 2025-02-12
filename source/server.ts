@@ -92,14 +92,14 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
         workDoneProgress.begin("Generating completions...");
 
         const stateDir = envPaths("acai").state;
-        const MESSAGES_FILE_PATH = path.join(
+        const completionMessagesPath = path.join(
           stateDir,
-          "completion-messages.jsonl",
+          "lsp-completion-messages.jsonl",
         );
 
         const langModel = wrapLanguageModel(
           languageModel("anthropic:haiku"),
-          auditMessage({ path: MESSAGES_FILE_PATH }),
+          auditMessage({ path: completionMessagesPath }),
         );
 
         const { text: completionText } = await generateText({
@@ -192,14 +192,14 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
       try {
         if (item.data?.uri && item.data?.detail) {
           const stateDir = envPaths("acai").state;
-          const MESSAGES_FILE_PATH = path.join(
+          const completionMessagesPath = path.join(
             stateDir,
-            "completion-messages.jsonl",
+            "lsp-completion-messages.jsonl",
           );
 
           const langModel = wrapLanguageModel(
             languageModel("anthropic:haiku"),
-            auditMessage({ path: MESSAGES_FILE_PATH }),
+            auditMessage({ path: completionMessagesPath }),
           );
 
           const { text: documentation } = await generateText({
@@ -252,9 +252,9 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
   connection.onCodeActionResolve(async (params) => {
     if (params.data?.documentUri && params.data?.range) {
       const stateDir = envPaths("acai").state;
-      const MESSAGES_FILE_PATH = path.join(
+      const codeActionMessages = path.join(
         stateDir,
-        "completion-messages.jsonl",
+        "lsp-code-action-messages.jsonl",
       );
 
       const textDocument = documents.get(params.data.documentUri);
@@ -272,7 +272,7 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
 
       const langModel = wrapLanguageModel(
         languageModel((context.model ?? "anthropic:sonnet") as ModelName),
-        auditMessage({ path: MESSAGES_FILE_PATH }),
+        auditMessage({ path: codeActionMessages }),
       );
 
       const userPrompt = `
