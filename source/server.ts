@@ -71,14 +71,16 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
       workDoneProgress: WorkDoneProgressReporter,
     ): Promise<CompletionItem[]> => {
       const document = documents.get(params.textDocument.uri);
-      if (!document) return [];
+      if (!document) {
+        return [];
+      }
 
       const position = params.position;
       const text = document.getText();
 
       // Get the current line up to the cursor position
       const lines = text.split("\n");
-      const currentLine = lines[position.line];
+      const currentLine = lines[position.line] ?? "";
       const linePrefix = currentLine.slice(0, position.character);
 
       // Get some context before the cursor (previous few lines)
@@ -144,7 +146,7 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
                   // Extract the parameter list
                   const paramMatch = insertText.match(/\((.*?)\)/);
                   if (paramMatch) {
-                    const params = paramMatch[1]
+                    const params = (paramMatch[1] ?? "")
                       .split(",")
                       .map((p) => p.trim());
                     // Add TypeScript generic and type annotations
@@ -187,7 +189,9 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
   connection.onCompletionResolve(
     async (item: CompletionItem): Promise<CompletionItem> => {
       // If we already have detailed information, return as is
-      if (item.documentation) return item;
+      if (item.documentation) {
+        return item;
+      }
 
       try {
         if (item.data?.uri && item.data?.detail) {
@@ -226,7 +230,9 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
   // Register code action handler
   connection.onCodeAction((params: CodeActionParams): CodeAction[] => {
     const textDocument = documents.get(params.textDocument.uri);
-    if (!textDocument) return [];
+    if (!textDocument) {
+      return [];
+    }
 
     const codeActions: CodeAction[] = [];
 
@@ -258,7 +264,9 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
       );
 
       const textDocument = documents.get(params.data.documentUri);
-      if (!textDocument) return params;
+      if (!textDocument) {
+        return params;
+      }
 
       // Get the text from the range where the code action was triggered
       const range = params.data.range as Range;
@@ -357,7 +365,7 @@ export const extractCode = (text: string): string => {
   const pattern = MD_CODE_BLOCK;
   const match = text.match(pattern);
   if (match) {
-    return match[1].trim();
+    return match[1]?.trim() ?? "";
   }
   return text;
 };
