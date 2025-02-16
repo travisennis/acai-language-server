@@ -30,16 +30,16 @@
     "check": "npx npm-check-updates  --interactive --format group"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^1.1.6",
-    "@travisennis/acai-core": "^0.0.21",
-    "@travisennis/stdlib": "^0.0.3",
-    "ai": "^4.1.34",
+    "@ai-sdk/anthropic": "^1.1.8",
+    "@travisennis/acai-core": "^0.0.24",
+    "@travisennis/stdlib": "^0.0.4",
+    "ai": "^4.1.41",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.12"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@types/node": "^22.13.1",
+    "@types/node": "^22.13.4",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"
   }
