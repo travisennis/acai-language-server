@@ -96,12 +96,12 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
         const stateDir = envPaths("acai").state;
         const completionMessagesPath = path.join(
           stateDir,
-          "lsp-completion-messages.jsonl",
+          `${(new Date()).toISOString()}-lsp-completion-message.json`,
         );
 
         const langModel = wrapLanguageModel(
           languageModel("anthropic:haiku"),
-          auditMessage({ path: completionMessagesPath }),
+          auditMessage({ path: completionMessagesPath, app: "lsp-completion" }),
         );
 
         const { text: completionText } = await generateText({
@@ -198,12 +198,15 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
           const stateDir = envPaths("acai").state;
           const completionMessagesPath = path.join(
             stateDir,
-            "lsp-completion-messages.jsonl",
+            `${(new Date()).toISOString()}-lsp-completion-message.json`,
           );
 
           const langModel = wrapLanguageModel(
             languageModel("anthropic:haiku"),
-            auditMessage({ path: completionMessagesPath }),
+            auditMessage({
+              path: completionMessagesPath,
+              app: "lsp-completion",
+            }),
           );
 
           const { text: documentation } = await generateText({
@@ -260,7 +263,7 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
       const stateDir = envPaths("acai").state;
       const codeActionMessages = path.join(
         stateDir,
-        "lsp-code-action-messages.jsonl",
+        `${(new Date()).toISOString()}-lsp-code-action-messages.json`,
       );
 
       const textDocument = documents.get(params.data.documentUri);
@@ -280,7 +283,7 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
 
       const langModel = wrapLanguageModel(
         languageModel((context.model ?? "anthropic:sonnet") as ModelName),
-        auditMessage({ path: codeActionMessages }),
+        auditMessage({ path: codeActionMessages, app: "lsp-code-action" }),
       );
 
       const userPrompt = `
