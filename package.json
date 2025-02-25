@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.1.10",
-    "@travisennis/acai-core": "^0.0.30",
+    "@travisennis/acai-core": "^0.0.31",
     "@travisennis/stdlib": "^0.0.4",
     "ai": "^4.1.46",
     "vscode-languageserver": "^9.0.1",
