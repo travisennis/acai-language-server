@@ -263,7 +263,7 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
       const stateDir = envPaths("acai").state;
       const codeActionMessages = path.join(
         stateDir,
-        `${(new Date()).toISOString()}-lsp-code-action-messages.json`,
+        `${(new Date()).toISOString()}-lsp-code-action-message.json`,
       );
 
       const textDocument = documents.get(params.data.documentUri);
