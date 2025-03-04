@@ -31,7 +31,7 @@ import {
   wrapLanguageModel,
 } from "@travisennis/acai-core";
 import { auditMessage } from "@travisennis/acai-core/middleware";
-import envPaths from "@travisennis/stdlib/env";
+import { envPaths } from "@travisennis/stdlib/env";
 
 export function createTextDocuments() {
   // Create a text document manager
@@ -101,7 +101,10 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
 
         const langModel = wrapLanguageModel(
           languageModel("anthropic:haiku"),
-          auditMessage({ path: completionMessagesPath, app: "lsp-completion" }),
+          auditMessage({
+            filePath: completionMessagesPath,
+            app: "lsp-completion",
+          }),
         );
 
         const { text: completionText } = await generateText({
@@ -204,7 +207,7 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
           const langModel = wrapLanguageModel(
             languageModel("anthropic:haiku"),
             auditMessage({
-              path: completionMessagesPath,
+              filePath: completionMessagesPath,
               app: "lsp-completion",
             }),
           );
@@ -240,7 +243,6 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
     const codeActions: CodeAction[] = [];
 
     const range = params.range;
-
     // Create the Instruct code action
     const instructAction: CodeAction = {
       title: "Acai - Instruct",
@@ -283,7 +285,7 @@ export function initConnection(documents: TextDocuments<TextDocument>) {
 
       const langModel = wrapLanguageModel(
         languageModel((context.model ?? "anthropic:sonnet") as ModelName),
-        auditMessage({ path: codeActionMessages, app: "lsp-code-action" }),
+        auditMessage({ filePath: codeActionMessages, app: "lsp-code-action" }),
       );
 
       const userPrompt = `
