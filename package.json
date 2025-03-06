@@ -30,10 +30,10 @@
     "check": "npx npm-check-updates  --interactive --format group"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^1.1.14",
-    "@travisennis/acai-core": "^0.0.45",
-    "@travisennis/stdlib": "^0.0.6",
-    "ai": "^4.1.51",
+    "@ai-sdk/anthropic": "^1.1.15",
+    "@travisennis/acai-core": "^0.0.46",
+    "@travisennis/stdlib": "^0.0.7",
+    "ai": "^4.1.53",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.12"
   },
