@@ -10,7 +10,11 @@
   "bin": {
     "acai-lsp": "./dist/index.js"
   },
-  "keywords": ["cli", "ai", "llm"],
+  "keywords": [
+    "cli",
+    "ai",
+    "llm"
+  ],
   "author": "Travis Ennis",
   "license": "MIT",
   "scripts": {
@@ -30,17 +34,17 @@
     "check": "npx npm-check-updates  --interactive --format group"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^1.1.15",
-    "@travisennis/acai-core": "^0.0.46",
-    "@travisennis/stdlib": "^0.0.7",
-    "ai": "^4.1.53",
+    "@ai-sdk/anthropic": "^1.2.12",
+    "@travisennis/acai-core": "^0.0.47",
+    "@travisennis/stdlib": "^0.0.13",
+    "ai": "^4.3.16",
     "vscode-languageserver": "^9.0.1",
     "vscode-languageserver-textdocument": "^1.0.12"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "@types/node": "^22.13.9",
-    "tsx": "^4.19.3",
-    "typescript": "^5.8.2"
+    "@biomejs/biome": "2.0.6",
+    "@types/node": "^24.0.7",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
   }
 }
